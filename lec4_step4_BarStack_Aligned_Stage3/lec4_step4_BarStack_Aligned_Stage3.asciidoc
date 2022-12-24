@@ -1,0 +1,694 @@
++*In[ ]:*+
+[source, ipython3]
+----
+## Python basics for novice data scientists, supported by Wagatsuma Lab@Kyutech 
+#
+# The MIT License (MIT): Copyright (c) 2020 Hiroaki Wagatsuma and Wagatsuma Lab@Kyutech
+# 
+# Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+# The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. */
+#
+# # @Time    : 2020-11-30 
+# # @Author  : Hiroaki Wagatsuma
+# # @Site    : https://github.com/hirowgit/2A1_python_intermediate_course
+# # @IDE     : Python 3.9.14 (main, Sep  6 2022, 23:29:09) [Clang 13.1.6 (clang-1316.0.21.2.5)] on darwin
+# # @File    : lec4_step4_BarStack_Aligned_Stage3.py 
+
+----
+
+
++*In[1]:*+
+[source, ipython3]
+----
+import numpy as np
+#prFill=[90    60    50    50    50    90    40    30    80    40  20 ]/100;
+prFill=np.array([90, 60, 50, 50, 50, 90, 40, 30, 80, 40, 20])
+prFill=prFill/100
+fillLine=np.full(len(prFill),True)
+LineT=[]
+k=0
+#for i in range(len(prFill)):
+#for i in range(5):
+for i in range(4):
+    if fillLine[i]:
+        remF=1-prFill[i]
+        IDrem=np.where((prFill[i+1:len(prFill)]<=remF) & fillLine[i+1:len(prFill)])
+        tmp=i
+        fID=i
+        j=0
+        while IDrem[0].size > 0:
+            fID=IDrem[0][0]+fID+1
+            tmp=np.append(tmp,fID)
+            remF=remF-prFill[fID]
+            IDrem=np.where((prFill[fID+1:len(prFill)]<=remF) & fillLine[fID+1:len(prFill)])
+        LineT.append(tmp)
+        fillLine[tmp]=False
+        print(k)
+        print(LineT)
+        k=k+1
+        print(k)
+        
+        
+
+----
+
+
++*Out[1]:*+
+----
+0
+[0]
+1
+1
+[0, array([1, 6])]
+2
+2
+[0, array([1, 6]), array([2, 3])]
+3
+----
+
+
++*In[ ]:*+
+[source, ipython3]
+----
+
+----
+
+
++*In[181]:*+
+[source, ipython3]
+----
+prFill[0:1:len(prFill)]
+----
+
+
++*Out[181]:*+
+----array([], dtype=float64)----
+
+
++*In[230]:*+
+[source, ipython3]
+----
+i=4
+----
+
+
++*In[231]:*+
+[source, ipython3]
+----
+remF=1-prFill[i]
+IDrem=np.where((prFill[i+1:len(prFill)]<=remF) & fillLine[i+1:len(prFill)])
+tmp=i
+fID=i
+----
+
+
++*In[197]:*+
+[source, ipython3]
+----
+remF
+----
+
+
++*Out[197]:*+
+----0.5----
+
+
++*In[198]:*+
+[source, ipython3]
+----
+IDrem
+----
+
+
++*Out[198]:*+
+----(array([2, 4, 5]),)----
+
+
++*In[200]:*+
+[source, ipython3]
+----
+IDrem[0][0]
+----
+
+
++*Out[200]:*+
+----2----
+
+
++*In[201]:*+
+[source, ipython3]
+----
+fID
+----
+
+
++*Out[201]:*+
+----4----
+
+
++*In[220]:*+
+[source, ipython3]
+----
+IDrem[0][0]+fID+1
+----
+
+
++*Out[220]:*+
+----7----
+
+
++*In[214]:*+
+[source, ipython3]
+----
+j
+----
+
+
++*Out[214]:*+
+----0----
+
+
++*In[215]:*+
+[source, ipython3]
+----
+i
+----
+
+
++*Out[215]:*+
+----4----
+
+
++*In[ ]:*+
+[source, ipython3]
+----
+
+----
+
+
++*In[232]:*+
+[source, ipython3]
+----
+fID=IDrem[0][0]+fID+1
+print(fID)
+tmp=np.append(tmp,fID)
+print(tmp)
+
+----
+
+
++*Out[232]:*+
+----
+7
+[4 7]
+----
+
+
++*In[233]:*+
+[source, ipython3]
+----
+prFill[IDrem[j][0]+i]
+----
+
+
++*Out[233]:*+
+----0.4----
+
+
++*In[216]:*+
+[source, ipython3]
+----
+IDrem[j][0]
+----
+
+
++*Out[216]:*+
+----2----
+
+
++*In[234]:*+
+[source, ipython3]
+----
+prFill[fID]
+remF=remF-prFill[fID]
+IDrem=np.where((prFill[fID+1:len(prFill)]<=remF) & fillLine[fID+1:len(prFill)])
+print(IDrem)
+----
+
+
++*Out[234]:*+
+----
+(array([2]),)
+----
+
+
++*In[235]:*+
+[source, ipython3]
+----
+fID=IDrem[0][0]+fID+1
+print(fID)
+tmp=np.append(tmp,fID)
+print(tmp)
+
+----
+
+
++*Out[235]:*+
+----
+10
+[ 4  7 10]
+----
+
+
++*In[221]:*+
+[source, ipython3]
+----
+prFill[fID]
+remF=remF-prFill[fID]
+IDrem=np.where((prFill[fID+1:len(prFill)]<=remF) & fillLine[fID+1:len(prFill)])
+print(IDrem)
+----
+
+
++*Out[221]:*+
+----
+0.0
+(array([], dtype=int64),)
+----
+
+
++*In[191]:*+
+[source, ipython3]
+----
+fID=IDrem[0][0]+fID+1
+----
+
+
++*In[172]:*+
+[source, ipython3]
+----
+prFill[1:-1]
+----
+
+
++*Out[172]:*+
+----array([0.6, 0.5, 0.5, 0.5, 0.9, 0.4, 0.3, 0.8, 0.4])----
+
+
++*In[174]:*+
+[source, ipython3]
+----
+len(prFill[fID+1:len(prFill)])
+----
+
+
++*Out[174]:*+
+----7----
+
+
++*In[176]:*+
+[source, ipython3]
+----
+ fillLine[fID+1:len(prFill)]
+----
+
+
++*Out[176]:*+
+----array([ True,  True, False,  True,  True,  True,  True])----
+
+
++*In[171]:*+
+[source, ipython3]
+----
+prFill[fID+1:-1]
+----
+
+
++*Out[171]:*+
+----array([0.5, 0.9, 0.4, 0.3, 0.8, 0.4])----
+
+
++*In[152]:*+
+[source, ipython3]
+----
+i=4
+----
+
+
++*In[158]:*+
+[source, ipython3]
+----
+remF=1-prFill[i]
+print(remF)
+----
+
+
++*Out[158]:*+
+----
+0.5
+----
+
+
++*In[159]:*+
+[source, ipython3]
+----
+prFill[i+1:-1]
+----
+
+
++*Out[159]:*+
+----array([0.9, 0.4, 0.3, 0.8, 0.4])----
+
+
++*In[160]:*+
+[source, ipython3]
+----
+fillLine[fID+1:-1]
+----
+
+
++*Out[160]:*+
+----array([ True,  True, False,  True,  True,  True])----
+
+
++*In[ ]:*+
+[source, ipython3]
+----
+
+----
+
+
++*In[154]:*+
+[source, ipython3]
+----
+prFill
+----
+
+
++*Out[154]:*+
+----array([0.9, 0.6, 0.5, 0.5, 0.5, 0.9, 0.4, 0.3, 0.8, 0.4, 0.2])----
+
+
++*In[149]:*+
+[source, ipython3]
+----
+fID=IDrem[0][0]+fID+1
+print(fID)
+tmp=np.append(tmp,fID)
+print(tmp)
+remF=remF-prFill[IDrem[j][0]+i]
+print(remF)
+IDrem=np.where((prFill[fID+1:-1]<=remF) & fillLine[fID+1:-1])
+print(IDrem)
+----
+
+
++*Out[149]:*+
+----
+7
+[4 7]
+0.09999999999999998
+(array([], dtype=int64),)
+----
+
+
++*In[146]:*+
+[source, ipython3]
+----
+remF=1-prFill[i]
+IDrem=np.where((prFill[i+1:-1]<=remF) & fillLine[i+1:-1])
+print(IDrem)
+tmp=i
+fID=i
+j=0
+----
+
+
++*Out[146]:*+
+----
+(array([2, 4]),)
+----
+
+
++*In[131]:*+
+[source, ipython3]
+----
+fID=IDrem[0][0]+fID+1
+print(fID)
+----
+
+
++*Out[131]:*+
+----
+5
+----
+
+
++*In[133]:*+
+[source, ipython3]
+----
+tmp=np.append(tmp,fID)
+remF=remF-prFill[IDrem[j][0]+i]
+----
+
+
++*In[134]:*+
+[source, ipython3]
+----
+remF
+
+----
+
+
++*Out[134]:*+
+----0.0----
+
+
++*In[118]:*+
+[source, ipython3]
+----
+remF
+----
+
+
++*Out[118]:*+
+----0.5----
+
+
++*In[112]:*+
+[source, ipython3]
+----
+fillLine
+----
+
+
++*Out[112]:*+
+----array([False, False, False, False,  True,  True, False,  True,  True,
+        True,  True])----
+
+
++*In[119]:*+
+[source, ipython3]
+----
+prFill[i+1:-1]
+----
+
+
++*Out[119]:*+
+----array([0.5, 0.9, 0.4, 0.3, 0.8, 0.4])----
+
+
++*In[100]:*+
+[source, ipython3]
+----
+print(IDrem[0].size)
+----
+
+
++*Out[100]:*+
+----
+3
+----
+
+
++*In[101]:*+
+[source, ipython3]
+----
+fID=IDrem[0][0]+fID+1
+print(fID)
+tmp=np.append(tmp,fID)
+print(tmp)
+
+----
+
+
++*Out[101]:*+
+----
+4
+[3 4]
+----
+
+
++*In[103]:*+
+[source, ipython3]
+----
+print(remF)
+print(IDrem[j][0])
+print(i)
+print(prFill[IDrem[j][0]+i])
+----
+
+
++*Out[103]:*+
+----
+0.5
+0
+3
+0.5
+----
+
+
++*In[105]:*+
+[source, ipython3]
+----
+prFill[IDrem[j][0]+i]
+
+----
+
+
++*Out[105]:*+
+----0.5----
+
+
++*In[107]:*+
+[source, ipython3]
+----
+j
+----
+
+
++*Out[107]:*+
+----0----
+
+
++*In[95]:*+
+[source, ipython3]
+----
+remF=remF-prFill[IDrem[j][0]+i]
+print(remF)
+IDrem=np.where((prFill[fID+1:-1]<=remF) & fillLine[fID+1:-1])
+print(IDrem)
+print(IDrem[0].size)
+LineT.append(tmp)
+print(LineT)
+----
+
+
++*Out[95]:*+
+----
+0.0
+(array([], dtype=int64),)
+0
+[0, array([1, 6]), array([2, 3]), array([3, 4])]
+----
+
+
++*In[62]:*+
+[source, ipython3]
+----
+np.where((prFill[fID+1:-1]<=remF) & fillLine[fID+1:-1])
+----
+
+
++*Out[62]:*+
+----(array([0, 3, 5]),)----
+
+
++*In[ ]:*+
+[source, ipython3]
+----
+
+----
+
+
++*In[97]:*+
+[source, ipython3]
+----
+prFill[fID+1:-1]
+----
+
+
++*Out[97]:*+
+----array([0.9, 0.4, 0.3, 0.8, 0.4])----
+
+
++*In[57]:*+
+[source, ipython3]
+----
+fID=IDrem[0][0]+fID+1
+print(fID)
+tmp=np.append(tmp,fID)
+print(tmp)
+----
+
+
++*Out[57]:*+
+----
+4
+[3 4]
+----
+
+
++*In[49]:*+
+[source, ipython3]
+----
+prFill[IDrem[j][0]+i]
+----
+
+
++*Out[49]:*+
+----0.5----
+
+
++*In[51]:*+
+[source, ipython3]
+----
+remF=remF-prFill[IDrem[j][0]+i]
+print(remF)
+----
+
+
++*Out[51]:*+
+----
+-0.5
+----
+
+
++*In[43]:*+
+[source, ipython3]
+----
+prFill[IDrem[j][0]+i]
+----
+
+
++*Out[43]:*+
+----0----
+
+
++*In[44]:*+
+[source, ipython3]
+----
+IDrem
+----
+
+
++*Out[44]:*+
+----(array([], dtype=int64),)----
+
+
++*In[ ]:*+
+[source, ipython3]
+----
+
+----

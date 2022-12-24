@@ -1,0 +1,467 @@
++*In[ ]:*+
+[source, ipython3]
+----
+## Python basics for novice data scientists, supported by Wagatsuma Lab@Kyutech 
+#
+# The MIT License (MIT): Copyright (c) 2020 Hiroaki Wagatsuma and Wagatsuma Lab@Kyutech
+# 
+# Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+# The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. */
+#
+# # @Time    : 2020-11-30 
+# # @Author  : Hiroaki Wagatsuma
+# # @Site    : https://github.com/hirowgit/2A1_python_intermediate_course
+# # @IDE     : Python 3.9.14 (main, Sep  6 2022, 23:29:09) [Clang 13.1.6 (clang-1316.0.21.2.5)] on darwin
+# # @File    : lec4_step6_BarStack_Aligned_Stage5.py 
+
+----
+
+
++*In[1]:*+
+[source, ipython3]
+----
+import numpy as np
+#prFill=[90    60    50    50    50    90    40    30    80    40  20 ]/100;
+prFill=np.array([90, 60, 50, 50, 50, 90, 40, 30, 80, 40, 20])
+prFill=prFill/100
+fillLine=np.full(len(prFill),True)
+LineT=[]
+tmp=[]
+k=0
+for i in range(len(prFill)):
+#for i in range(5):
+#for i in range(5):
+    if fillLine[i]:
+        remF=1-prFill[i]
+        IDrem=np.where((prFill[i+1:len(prFill)]<=remF) & fillLine[i+1:len(prFill)])
+        tmp=i
+        fID=i
+        #j=0
+        while IDrem[0].size > 0:
+            fID=IDrem[0][0]+fID+1
+            tmp=np.append(tmp,fID)
+            remF=remF-prFill[fID]
+            IDrem=np.where((prFill[fID+1:len(prFill)]<=remF) & fillLine[fID+1:len(prFill)])
+        LineT.append(tmp)
+        fillLine[tmp]=False
+        print("k;",k)
+        print("LineT;",LineT)
+        k=k+1
+        print("k;",k)
+----
+
+
++*Out[1]:*+
+----
+k; 0
+LineT; [0]
+k; 1
+k; 1
+LineT; [0, array([1, 6], dtype=int64)]
+k; 2
+k; 2
+LineT; [0, array([1, 6], dtype=int64), array([2, 3], dtype=int64)]
+k; 3
+k; 3
+LineT; [0, array([1, 6], dtype=int64), array([2, 3], dtype=int64), array([ 4,  7, 10], dtype=int64)]
+k; 4
+k; 4
+LineT; [0, array([1, 6], dtype=int64), array([2, 3], dtype=int64), array([ 4,  7, 10], dtype=int64), 5]
+k; 5
+k; 5
+LineT; [0, array([1, 6], dtype=int64), array([2, 3], dtype=int64), array([ 4,  7, 10], dtype=int64), 5, 8]
+k; 6
+k; 6
+LineT; [0, array([1, 6], dtype=int64), array([2, 3], dtype=int64), array([ 4,  7, 10], dtype=int64), 5, 8, 9]
+k; 7
+----
+
+
++*In[2]:*+
+[source, ipython3]
+----
+#行列の要素内の型が違うことが問題となる
+for i in LineT:
+    print(type(i))
+----
+
+
++*Out[2]:*+
+----
+<class 'int'>
+<class 'numpy.ndarray'>
+<class 'numpy.ndarray'>
+<class 'numpy.ndarray'>
+<class 'int'>
+<class 'int'>
+<class 'int'>
+----
+
+
++*In[3]:*+
+[source, ipython3]
+----
+#型がintのものを'numpy.ndarray'に変換
+f_LineT = [np.array(i) if type(i)==int else i for i in LineT]
+print(f_LineT)
+[print(type(i)) for i in f_LineT]
+----
+
+
++*Out[3]:*+
+----
+[array(0), array([1, 6], dtype=int64), array([2, 3], dtype=int64), array([ 4,  7, 10], dtype=int64), array(5), array(8), array(9)]
+<class 'numpy.ndarray'>
+<class 'numpy.ndarray'>
+<class 'numpy.ndarray'>
+<class 'numpy.ndarray'>
+<class 'numpy.ndarray'>
+<class 'numpy.ndarray'>
+<class 'numpy.ndarray'>
+[None, None, None, None, None, None, None]----
+
+
++*In[3]:*+
+[source, ipython3]
+----
+LineT
+----
+
+
++*Out[3]:*+
+----[0,
+ array([1, 6], dtype=int64),
+ array([2, 3], dtype=int64),
+ array([ 4,  7, 10], dtype=int64),
+ 5,
+ 8,
+ 9]----
+
+
++*In[4]:*+
+[source, ipython3]
+----
+#lenLineT=cell2mat(cellfun(@(x) length(x),LineT,'UniformOutput',false));に該当部
+lenLineT = [i.size for i in f_LineT]
+print(lenLineT)
+----
+
+
++*Out[4]:*+
+----
+[1, 2, 2, 3, 1, 1, 1]
+----
+
+
++*In[5]:*+
+[source, ipython3]
+----
+#stackBarD=zeros(size(LineT,2),max(lenLineT));に該当部
+stackBarD = np.zeros((np.shape(f_LineT)[0],max(lenLineT)))
+print(stackBarD)
+----
+
+
++*Out[5]:*+
+----
+[[0. 0. 0.]
+ [0. 0. 0.]
+ [0. 0. 0.]
+ [0. 0. 0.]
+ [0. 0. 0.]
+ [0. 0. 0.]
+ [0. 0. 0.]]
+
+C:\Users\Kaito\anaconda3\lib\site-packages\numpy\core\_asarray.py:102: VisibleDeprecationWarning: Creating an ndarray from ragged nested sequences (which is a list-or-tuple of lists-or-tuples-or ndarrays with different lengths or shapes) is deprecated. If you meant to do this, you must specify 'dtype=object' when creating the ndarray.
+  return array(a, dtype, copy=False, order=order)
+----
+
+
++*In[6]:*+
+[source, ipython3]
+----
+len(f_LineT)
+----
+
+
++*Out[6]:*+
+----7----
+
+
++*In[7]:*+
+[source, ipython3]
+----
+f_LineT[1]
+print(prFill)
+i = [1, 6]
+print(prFill[i])
+----
+
+
++*Out[7]:*+
+----
+[0.9 0.6 0.5 0.5 0.5 0.9 0.4 0.3 0.8 0.4 0.2]
+[0.6 0.4]
+----
+
+
++*In[12]:*+
+[source, ipython3]
+----
+#stackBarDにグラフに積み上げるprFillの値を置き換え
+for i in range(len(f_LineT)):
+    tmp = f_LineT[i]
+#     print(prFill[tmp])
+    print(lenLineT[i])
+    print(stackBarD[i,0:lenLineT[i]])
+    stackBarD[i,0:lenLineT[i]] = prFill[tmp] 
+    print(stackBarD)
+----
+
+
++*Out[12]:*+
+----
+1
+[0.9]
+[[0.9 0.  0. ]
+ [0.6 0.4 0. ]
+ [0.5 0.5 0. ]
+ [0.5 0.3 0.2]
+ [0.9 0.  0. ]
+ [0.8 0.  0. ]
+ [0.4 0.  0. ]]
+2
+[0.6 0.4]
+[[0.9 0.  0. ]
+ [0.6 0.4 0. ]
+ [0.5 0.5 0. ]
+ [0.5 0.3 0.2]
+ [0.9 0.  0. ]
+ [0.8 0.  0. ]
+ [0.4 0.  0. ]]
+2
+[0.5 0.5]
+[[0.9 0.  0. ]
+ [0.6 0.4 0. ]
+ [0.5 0.5 0. ]
+ [0.5 0.3 0.2]
+ [0.9 0.  0. ]
+ [0.8 0.  0. ]
+ [0.4 0.  0. ]]
+3
+[0.5 0.3 0.2]
+[[0.9 0.  0. ]
+ [0.6 0.4 0. ]
+ [0.5 0.5 0. ]
+ [0.5 0.3 0.2]
+ [0.9 0.  0. ]
+ [0.8 0.  0. ]
+ [0.4 0.  0. ]]
+1
+[0.9]
+[[0.9 0.  0. ]
+ [0.6 0.4 0. ]
+ [0.5 0.5 0. ]
+ [0.5 0.3 0.2]
+ [0.9 0.  0. ]
+ [0.8 0.  0. ]
+ [0.4 0.  0. ]]
+1
+[0.8]
+[[0.9 0.  0. ]
+ [0.6 0.4 0. ]
+ [0.5 0.5 0. ]
+ [0.5 0.3 0.2]
+ [0.9 0.  0. ]
+ [0.8 0.  0. ]
+ [0.4 0.  0. ]]
+1
+[0.4]
+[[0.9 0.  0. ]
+ [0.6 0.4 0. ]
+ [0.5 0.5 0. ]
+ [0.5 0.3 0.2]
+ [0.9 0.  0. ]
+ [0.8 0.  0. ]
+ [0.4 0.  0. ]]
+----
+
+
++*In[ ]:*+
+[source, ipython3]
+----
+
+----
+
+
++*In[11]:*+
+[source, ipython3]
+----
+y_data_stack = []
+y_data_stack = tuple([np.append(y_data_stack, i)  for i in stackBarD])
+print(y_data_stack)
+----
+
+
++*Out[11]:*+
+----
+(array([0.9, 0. , 0. ]), array([0.6, 0.4, 0. ]), array([0.5, 0.5, 0. ]), array([0.5, 0.3, 0.2]), array([0.9, 0. , 0. ]), array([0.8, 0. , 0. ]), array([0.4, 0. , 0. ]))
+----
+
+
++*In[13]:*+
+[source, ipython3]
+----
+LineT[0]
+----
+
+
++*Out[13]:*+
+----0----
+
+
++*In[98]:*+
+[source, ipython3]
+----
+x_label = [i+1 for i in range(len(prFill))]
+x_stack_label = ['L'+str(i+1) for i in range(len(stackBarD))]
+y_label = np.arange(0, 12, 2)
+y_label =[i/10 for i in y_label]
+print(x_label)
+print(x_stack_label)
+print(y_label)
+
+----
+
+
++*Out[98]:*+
+----
+[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+['L1', 'L2', 'L3', 'L4', 'L5', 'L6', 'L7']
+[0.0, 0.2, 0.4, 0.6, 0.8, 1.0]
+----
+
+
++*In[63]:*+
+[source, ipython3]
+----
+#matplotlibモジュールの読み込み
+import matplotlib.pyplot as plt
+----
+
+
++*In[97]:*+
+[source, ipython3]
+----
+#2つのグラフの表示画面の分割
+fig = plt.figure(figsize=(30,13), dpi=50)
+init_fig = fig.add_subplot(2 , 1, 1)
+stack_fig = fig.add_subplot(2, 1, 2)
+
+#上のグラフの表示設定
+#参考；https://www.yutaka-note.com/entry/matplotlib_axis
+
+init_fig.set_xlabel("store ID", size = 25)
+init_fig.set_xticks(x_label)
+init_fig.set_xticklabels(x_label, size=20)
+
+init_fig.set_ylabel("Action Steps(AS)", size = 25)
+init_fig.set_yticks(y_label)
+init_fig.set_yticklabels(y_label, size=20)
+init_fig.set_ylim(0 , 1)
+# init_fig.set_yticks(np.arange(0, 1, 0.2))
+# init_fig.title("")
+init_fig.grid(True)
+#上のグラフの表示
+init_fig.bar(x_label, prFill, color = 'w', edgecolor ='black', linewidth = '5')
+----
+
+
++*Out[97]:*+
+----<BarContainer object of 11 artists>
+![png](lec4_step6_BarStack_Aligned_Stage5_files/lec4_step6_BarStack_Aligned_Stage5_15_1.png)
+----
+
+
++*In[ ]:*+
+[source, ipython3]
+----
+#下のグラフの表示設定
+#参考；https://www.yutaka-note.com/entry/matplotlib_axis
+
+stack_fig.set_xlabel("store ID", size = 25)
+stack_fig.set_xticks(x_stack_label)
+stack_fig.set_xticklabels(x_stack_label, size=20)
+
+stack_fig.set_ylabel("Action Steps(AS)", size = 25)
+stack_fig.set_yticks(y_label)
+stack_fig.set_yticklabels(y_label, size=20)
+stack_fig.set_ylim(0 , 1)
+# init_fig.set_yticks(np.arange(0, 1, 0.2))
+# init_fig.title("")
+stack_fig.grid(True)
+#上のグラフの表示
+stack_fig.bar(x_label, prFill, color = 'w', edgecolor ='black', linewidth = '5')
+----
+
+
++*In[26]:*+
+[source, ipython3]
+----
+init_fig.bar(x_label, prFill)
+# plt.show
+----
+
+
++*Out[26]:*+
+----<BarContainer object of 11 artists>----
+
+
++*In[ ]:*+
+[source, ipython3]
+----
+len(LineT[1])
+----
+
+
++*In[ ]:*+
+[source, ipython3]
+----
+LineT[2].size
+----
+
+
++*In[ ]:*+
+[source, ipython3]
+----
+
+----
+
+
++*In[ ]:*+
+[source, ipython3]
+----
+
+----
+
+
++*In[ ]:*+
+[source, ipython3]
+----
+
+----
+
+
++*In[ ]:*+
+[source, ipython3]
+----
+
+----
+
+
++*In[ ]:*+
+[source, ipython3]
+----
+
+----
